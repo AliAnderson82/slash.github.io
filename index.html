@@ -100,12 +100,14 @@
     </div>
 
     <script>
-        // Change this IP to your actual IP address or fetch dynamically
-        const adminIP = "135.148.233.69";
+        const adminIP = "127.0.0.1"; // Replace with actual IP detection if available
+
+        // Load posts from localStorage on page load
+        document.addEventListener("DOMContentLoaded", loadPosts);
 
         // Function to simulate fetching user's IP
         function getUserIP() {
-            return "135.148.233.69"; // Replace with actual IP detection if needed
+            return "127.0.0.1"; // Replace with actual IP detection if available
         }
 
         // Function to create a new post
@@ -114,27 +116,53 @@
             const message = input.value.trim();
 
             if (message) {
-                const feed = document.getElementById("feed");
-
-                // Create new post element
-                const post = document.createElement("li");
-                post.classList.add("post");
-
-                // Determine if the user is admin or anonymous
                 const isAdmin = getUserIP() === adminIP;
                 const username = isAdmin ? "/admin" : "/user";
 
-                post.innerHTML = `
-                    <span class="username">${username}</span>
-                    <div class="message">${message}</div>
-                `;
+                // Create post object
+                const post = {
+                    username: username,
+                    message: message,
+                    timestamp: new Date().toISOString()
+                };
 
-                // Add post to the top of the feed
-                feed.insertBefore(post, feed.firstChild);
+                // Save to localStorage
+                savePostToLocalStorage(post);
+
+                // Add post to feed
+                addPostToFeed(post);
 
                 // Clear input field
                 input.value = "";
             }
+        }
+
+        // Save post to localStorage
+        function savePostToLocalStorage(post) {
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+            posts.push(post);
+            localStorage.setItem("posts", JSON.stringify(posts));
+        }
+
+        // Load posts from localStorage
+        function loadPosts() {
+            const posts = JSON.parse(localStorage.getItem("posts")) || [];
+            posts.forEach(addPostToFeed);
+        }
+
+        // Add post to the feed
+        function addPostToFeed(post) {
+            const feed = document.getElementById("feed");
+
+            const postElement = document.createElement("li");
+            postElement.classList.add("post");
+
+            postElement.innerHTML = `
+                <span class="username">${post.username}</span>
+                <div class="message">${post.message}</div>
+            `;
+
+            feed.appendChild(postElement);
         }
     </script>
 </body>
