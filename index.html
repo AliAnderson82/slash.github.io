@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slash - Direct Message</title>
+    <title>Slash</title>
     <style>
         * {
             box-sizing: border-box;
@@ -110,111 +110,155 @@
             margin-top: 10px;
         }
 
-        .feed {
+        .feed, .dm-feed {
             list-style-type: none;
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
         }
 
-        .post {
+        .post, .dm-post {
             padding: 10px 15px;
             margin: 10px;
             border-radius: 8px;
             background-color: #22303c;
-            display: flex;
-            align-items: center;
         }
 
-        .post.user1 {
+        .dm-post.user1 {
             justify-content: flex-start;
             background-color: #1d9bf0;
         }
 
-        .post.user2 {
+        .dm-post.user2 {
             justify-content: flex-end;
             background-color: #8899a6;
         }
 
-        .post .username {
+        .post .username, .dm-post .username {
             font-weight: bold;
-            color: #ffffff;
-            margin-right: 10px;
+            color: #1d9bf0;
         }
 
-        .post .message {
+        .post .message, .dm-post .message {
+            margin-top: 8px;
             font-size: 16px;
-            color: #ffffff;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Slash</h2>
-        <div class="nav-item">
+        <div class="nav-item" onclick="showHome()">
             <div class="icon"></div> Home
         </div>
-        <div class="nav-item">
+        <div class="nav-item" onclick="showDMs()">
             <div class="icon"></div> Direct Messages
         </div>
     </div>
 
-    <div class="container">
-        <header>Direct Message</header>
-
-        <ul id="feed" class="feed"></ul>
-
+    <div id="homeContainer" class="container">
+        <header>Home</header>
         <div class="input-area">
-            <textarea id="postInput" placeholder="Type a message..."></textarea>
-            <button onclick="postMessage()">Send</button>
+            <textarea id="homeInput" placeholder="What's happening?"></textarea>
+            <button onclick="postHomeMessage()">Post</button>
+        </div>
+        <ul id="homeFeed" class="feed"></ul>
+    </div>
+
+    <div id="dmContainer" class="container hidden">
+        <header>Direct Message</header>
+        <ul id="dmFeed" class="dm-feed"></ul>
+        <div class="input-area">
+            <textarea id="dmInput" placeholder="Type a message..."></textarea>
+            <button onclick="postDMMessage()">Send</button>
         </div>
     </div>
 
     <script>
-        let currentUser = "user1"; // Toggle between user1 and user2 for messaging
+        let currentUser = "user1";
 
-        document.addEventListener("DOMContentLoaded", loadPosts);
+        document.addEventListener("DOMContentLoaded", () => {
+            loadHomePosts();
+            loadDMPosts();
+        });
 
-        // Toggle user on each message sent to simulate 2 users in conversation
-        function postMessage() {
-            const input = document.getElementById("postInput");
+        function showHome() {
+            document.getElementById("homeContainer").classList.remove("hidden");
+            document.getElementById("dmContainer").classList.add("hidden");
+        }
+
+        function showDMs() {
+            document.getElementById("dmContainer").classList.remove("hidden");
+            document.getElementById("homeContainer").classList.add("hidden");
+        }
+
+        function postHomeMessage() {
+            const input = document.getElementById("homeInput");
             const message = input.value.trim();
 
             if (message) {
                 const post = {
-                    username: currentUser,
+                    username: "/user",
                     message: message,
                     timestamp: new Date().toISOString()
                 };
 
-                savePostToLocalStorage(post);
-                addPostToFeed(post);
+                savePostToLocalStorage("homeFeedPosts", post);
+                addPostToFeed(post, "homeFeed");
                 input.value = "";
+            }
+        }
 
-                // Toggle between two users
+        function postDMMessage() {
+            const input = document.getElementById("dmInput");
+            const message = input.value.trim();
+
+            if (message) {
+                const post = {
+                    username: currentUser === "user1" ? "/user1" : "/user2",
+                    message: message,
+                    timestamp: new Date().toISOString()
+                };
+
+                savePostToLocalStorage("dmFeedPosts", post);
+                addPostToFeed(post, "dmFeed", true);
+                input.value = "";
                 currentUser = currentUser === "user1" ? "user2" : "user1";
             }
         }
 
-        function savePostToLocalStorage(post) {
-            let posts = JSON.parse(localStorage.getItem("privateChat")) || [];
+        function savePostToLocalStorage(key, post) {
+            let posts = JSON.parse(localStorage.getItem(key)) || [];
             posts.push(post);
-            localStorage.setItem("privateChat", JSON.stringify(posts));
+            localStorage.setItem(key, JSON.stringify(posts));
         }
 
-        function loadPosts() {
-            const posts = JSON.parse(localStorage.getItem("privateChat")) || [];
-            posts.forEach(addPostToFeed);
+        function loadHomePosts() {
+            const posts = JSON.parse(localStorage.getItem("homeFeedPosts")) || [];
+            posts.forEach(post => addPostToFeed(post, "homeFeed"));
         }
 
-        function addPostToFeed(post) {
-            const feed = document.getElementById("feed");
+        function loadDMPosts() {
+            const posts = JSON.parse(localStorage.getItem("dmFeedPosts")) || [];
+            posts.forEach(post => addPostToFeed(post, "dmFeed", true));
+        }
+
+        function addPostToFeed(post, feedId, isDM = false) {
+            const feed = document.getElementById(feedId);
 
             const postElement = document.createElement("li");
-            postElement.classList.add("post", post.username);
+            postElement.classList.add(isDM ? "dm-post" : "post");
+
+            if (isDM) {
+                postElement.classList.add(post.username === "/user1" ? "user1" : "user2");
+            }
 
             postElement.innerHTML = `
-                <span class="username">${post.username === "user1" ? "/user1" : "/user2"}</span>
+                <span class="username">${post.username}</span>
                 <div class="message">${post.message}</div>
             `;
 
