@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slash</title>
+    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png"> <!-- Favicon link -->
     <style>
         * {
             box-sizing: border-box;
@@ -11,7 +12,7 @@
             padding: 0;
             font-family: Arial, sans-serif;
         }
-        
+
         body {
             background-color: #15202b;
             color: #ffffff;
@@ -19,8 +20,9 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        
+
         .sidebar {
             width: 250px;
             padding: 20px;
@@ -30,15 +32,40 @@
             position: fixed;
             left: 0;
             top: 0;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            transform: translateX(0);
         }
-        
-        .sidebar h2 {
+
+        /* Logo and Title Styling */
+        .title-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
+            background-size: contain;
+        }
+
+        .title-text {
+            font-family: 'Courier New', Courier, monospace;
             font-size: 28px;
             color: #1d9bf0;
-            margin-bottom: 20px;
-            text-align: left;
+            transition: color 0.3s ease;
         }
-        
+
+        .description {
+            font-size: 14px;
+            color: #8899a6; /* A lighter color for the description */
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
         .sidebar .nav-item {
             padding: 15px 10px;
             margin-bottom: 10px;
@@ -48,29 +75,41 @@
             color: #ffffff;
             cursor: pointer;
             border-radius: 8px;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            position: relative;
         }
-        
+
         .sidebar .nav-item:hover {
             background-color: #22303c;
+            transform: scale(1.05);
         }
-        
-        .sidebar .icon {
-            width: 24px;
-            height: 24px;
-            background-color: #1d9bf0;
+
+        .notification-badge {
+            background-color: #ff4757;
+            color: #ffffff;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            transition: transform 0.3s ease;
         }
-        
+
         .container {
             width: 600px;
             border: 1px solid #333;
-            background-color: #1c2733;
             margin-left: 270px;
             padding-top: 10px;
+            transition: background-color 0.3s ease, border 0.3s ease;
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
         }
-        
+
         header {
             background-color: #22303c;
             padding: 10px 20px;
@@ -78,6 +117,7 @@
             border-bottom: 1px solid #333;
             font-weight: bold;
             font-size: 24px;
+            transition: background-color 0.3s ease;
         }
 
         .input-area {
@@ -96,6 +136,11 @@
             font-size: 16px;
             border-radius: 8px;
             outline: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-area textarea:focus {
+            background-color: #2c3644;
         }
 
         .input-area button {
@@ -108,56 +153,124 @@
             font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .feed, .dm-feed {
+        .input-area button:hover {
+            background-color: #1a8cd8;
+            transform: scale(1.05);
+        }
+
+        .feed, .dm-feed, .notifications-feed {
             list-style-type: none;
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
         }
 
-        .post, .dm-post {
+        .post, .dm-post, .notification {
             padding: 10px 15px;
             margin: 10px;
             border-radius: 8px;
             background-color: #22303c;
+            transition: background-color 0.3s ease;
+        }
+
+        .post:hover, .dm-post:hover, .notification:hover {
+            background-color: #2c3644;
         }
 
         .dm-post.user1 {
-            justify-content: flex-start;
             background-color: #1d9bf0;
+            color: #ffffff;
         }
 
         .dm-post.user2 {
-            justify-content: flex-end;
             background-color: #8899a6;
+            color: #15202b;
         }
 
-        .post .username, .dm-post .username {
+        .dm-post .username {
             font-weight: bold;
-            color: #1d9bf0;
         }
 
-        .post .message, .dm-post .message {
-            margin-top: 8px;
-            font-size: 16px;
+        .dm-post.user1 .username {
+            color: #ffffff;
         }
-        
+
+        .dm-post.user2 .username {
+            color: #15202b;
+        }
+
         .hidden {
             display: none;
+        }
+
+        /* Light mode styles */
+        body.light-mode {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .sidebar.light-mode {
+            background-color: #f0f0f0;
+            border-right: 1px solid #ccc;
+        }
+
+        .container.light-mode {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+        }
+
+        header.light-mode {
+            background-color: #e0e0e0;
+            color: #000000;
+        }
+
+        .input-area.light-mode textarea {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            color: #000000;
+        }
+
+        .input-area.light-mode button {
+            background-color: #1d9bf0;
+        }
+
+        .post.light-mode, .dm-post.light-mode, .notification.light-mode {
+            background-color: #e0e0e0;
+            color: #000000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Canvas Styling */
+        #turtleCanvas {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #1d9bf0;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Slash</h2>
-        <div class="nav-item" onclick="showHome()">
-            <div class="icon"></div> Home
+        <div class="title-logo">
+            <div class="logo"></div>
+            <div class="title-text">Slash</div>
+            <div class="description">Anonymity Rules</div>
         </div>
-        <div class="nav-item" onclick="showDMs()">
-            <div class="icon"></div> Direct Messages
+        <div class="nav-item" onclick="showHome()">Home</div>
+        <div class="nav-item" onclick="showDMs()">Direct Messages</div>
+        <div class="nav-item" onclick="showNotifications()">Notifications
+            <div id="notificationBadge" class="notification-badge hidden">0</div>
         </div>
+        <div class="nav-item" onclick="showSettings()">Settings</div>
     </div>
 
     <div id="homeContainer" class="container">
@@ -178,36 +291,66 @@
         </div>
     </div>
 
-    <script>
-        let currentUser = "user1";
+    <div id="notificationsContainer" class="container hidden">
+        <header>Notifications</header>
+        <ul id="notificationsFeed" class="notifications-feed"></ul>
+    </div>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadHomePosts();
-            loadDMPosts();
-        });
+    <div id="settingsContainer" class="container hidden">
+        <header>Settings</header>
+        <div>
+            <label for="themeSelect">Choose Theme:</label>
+            <select id="themeSelect" onchange="changeTheme()">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+            </select>
+        </div>
+    </div>
+
+    <canvas id="turtleCanvas" width="800" height="600"></canvas>
+
+    <script>
+        let unreadNotifications = 0;
+
+        // Add event listener to the document to listen for keypresses
+        document.addEventListener('keydown', checkEasterEgg);
 
         function showHome() {
+            hideAllContainers();
             document.getElementById("homeContainer").classList.remove("hidden");
-            document.getElementById("dmContainer").classList.add("hidden");
         }
 
         function showDMs() {
+            hideAllContainers();
             document.getElementById("dmContainer").classList.remove("hidden");
+        }
+
+        function showNotifications() {
+            hideAllContainers();
+            document.getElementById("notificationsContainer").classList.remove("hidden");
+        }
+
+        function showSettings() {
+            hideAllContainers();
+            document.getElementById("settingsContainer").classList.remove("hidden");
+        }
+
+        function hideAllContainers() {
             document.getElementById("homeContainer").classList.add("hidden");
+            document.getElementById("dmContainer").classList.add("hidden");
+            document.getElementById("notificationsContainer").classList.add("hidden");
+            document.getElementById("settingsContainer").classList.add("hidden");
         }
 
         function postHomeMessage() {
             const input = document.getElementById("homeInput");
             const message = input.value.trim();
-
             if (message) {
                 const post = {
                     username: "/user",
                     message: message,
                     timestamp: new Date().toISOString()
                 };
-
-                savePostToLocalStorage("homeFeedPosts", post);
                 addPostToFeed(post, "homeFeed");
                 input.value = "";
             }
@@ -216,53 +359,104 @@
         function postDMMessage() {
             const input = document.getElementById("dmInput");
             const message = input.value.trim();
-
             if (message) {
                 const post = {
-                    username: currentUser === "user1" ? "/user1" : "/user2",
+                    username: "/user",
                     message: message,
                     timestamp: new Date().toISOString()
                 };
-
-                savePostToLocalStorage("dmFeedPosts", post);
-                addPostToFeed(post, "dmFeed", true);
+                addPostToFeed(post, "dmFeed");
                 input.value = "";
-                currentUser = currentUser === "user1" ? "user2" : "user1";
+                addNotification("New direct message received!");
             }
         }
 
-        function savePostToLocalStorage(key, post) {
-            let posts = JSON.parse(localStorage.getItem(key)) || [];
-            posts.push(post);
-            localStorage.setItem(key, JSON.stringify(posts));
-        }
-
-        function loadHomePosts() {
-            const posts = JSON.parse(localStorage.getItem("homeFeedPosts")) || [];
-            posts.forEach(post => addPostToFeed(post, "homeFeed"));
-        }
-
-        function loadDMPosts() {
-            const posts = JSON.parse(localStorage.getItem("dmFeedPosts")) || [];
-            posts.forEach(post => addPostToFeed(post, "dmFeed", true));
-        }
-
-        function addPostToFeed(post, feedId, isDM = false) {
+        function addPostToFeed(post, feedId) {
             const feed = document.getElementById(feedId);
-
             const postElement = document.createElement("li");
-            postElement.classList.add(isDM ? "dm-post" : "post");
-
-            if (isDM) {
-                postElement.classList.add(post.username === "/user1" ? "user1" : "user2");
-            }
-
-            postElement.innerHTML = `
-                <span class="username">${post.username}</span>
-                <div class="message">${post.message}</div>
-            `;
-
+            postElement.classList.add(feedId === "homeFeed" ? "post" : "dm-post", "user1");
+            postElement.innerHTML = `<div class="username">${post.username}</div><div>${post.message}</div>`;
             feed.appendChild(postElement);
+        }
+
+        function addNotification(message) {
+            unreadNotifications++;
+            document.getElementById("notificationBadge").textContent = unreadNotifications;
+            document.getElementById("notificationBadge").classList.remove("hidden");
+            const notificationFeed = document.getElementById("notificationsFeed");
+            const notificationElement = document.createElement("li");
+            notificationElement.classList.add("notification");
+            notificationElement.textContent = message;
+            notificationFeed.appendChild(notificationElement);
+        }
+
+        function changeTheme() {
+            const theme = document.getElementById("themeSelect").value;
+            if (theme === "light") {
+                document.body.classList.add("light-mode");
+                document.querySelector(".sidebar").classList.add("light-mode");
+                document.querySelector(".container").classList.add("light-mode");
+                document.querySelectorAll("header").forEach(header => header.classList.add("light-mode"));
+                document.querySelectorAll(".post, .dm-post, .notification").forEach(post => post.classList.add("light-mode"));
+            } else {
+                document.body.classList.remove("light-mode");
+                document.querySelector(".sidebar").classList.remove("light-mode");
+                document.querySelector(".container").classList.remove("light-mode");
+                document.querySelectorAll("header").forEach(header => header.classList.remove("light-mode"));
+                document.querySelectorAll(".post, .dm-post, .notification").forEach(post => post.classList.remove("light-mode"));
+            }
+        }
+
+        function checkEasterEgg(event) {
+            const input = document.getElementById("homeInput");
+            // Check if the message input is not focused
+            if (document.activeElement !== input) {
+                const currentText = input.value;
+                if (currentText.endsWith("awesome")) {
+                    startTurtleAnimation();
+                }
+            }
+        }
+
+        function startTurtleAnimation() {
+            const canvas = document.getElementById("turtleCanvas");
+            const context = canvas.getContext("2d");
+            canvas.style.display = "block"; // Show the canvas
+
+            // Clear the canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = "black";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            let angle = 0;
+            const colors = ["blue", "red", "darkviolet", "green", "yellow", "white", "darkblue"];
+            let colorIndex = 0;
+
+            function draw() {
+                context.fillStyle = colors[colorIndex];
+                context.beginPath();
+                context.moveTo(canvas.width / 2, canvas.height / 2);
+                context.lineTo(canvas.width / 2 + Math.cos(angle) * 10, canvas.height / 2 + Math.sin(angle) * 10);
+                context.stroke();
+                context.closePath();
+
+                angle += Math.PI / 30;
+                colorIndex = (colorIndex + 1) % colors.length;
+
+                // Draw a circle around
+                context.beginPath();
+                context.arc(canvas.width / 2, canvas.height / 2, 123, 0, Math.PI * 2);
+                context.strokeStyle = colors[colorIndex];
+                context.stroke();
+                context.closePath();
+
+                if (angle < Math.PI * 20) {
+                    requestAnimationFrame(draw);
+                } else {
+                    canvas.style.display = "none"; // Hide the canvas after the animation
+                }
+            }
+            draw();
         }
     </script>
 </body>
