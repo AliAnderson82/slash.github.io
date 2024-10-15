@@ -21,10 +21,54 @@
             min-height: 100vh;
         }
         
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            background-color: #1c2733;
+            border-right: 1px solid #333;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        
+        .sidebar h2 {
+            font-size: 28px;
+            color: #1d9bf0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .sidebar .nav-item {
+            padding: 15px 10px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar .nav-item:hover {
+            background-color: #22303c;
+        }
+        
+        .sidebar .icon {
+            width: 24px;
+            height: 24px;
+            background-color: #1d9bf0;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
         .container {
             width: 600px;
             border: 1px solid #333;
             background-color: #1c2733;
+            margin-left: 270px;
+            padding-top: 10px;
         }
         
         header {
@@ -88,8 +132,27 @@
     </style>
 </head>
 <body>
+    <div class="sidebar">
+        <h2>Slash</h2>
+        <div class="nav-item">
+            <div class="icon"></div> Home
+        </div>
+        <div class="nav-item">
+            <div class="icon"></div> Explore
+        </div>
+        <div class="nav-item">
+            <div class="icon"></div> Notifications
+        </div>
+        <div class="nav-item">
+            <div class="icon"></div> Messages
+        </div>
+        <div class="nav-item">
+            <div class="icon"></div> Profile
+        </div>
+    </div>
+
     <div class="container">
-        <header>Slash</header>
+        <header>Home</header>
 
         <div class="input-area">
             <textarea id="postInput" placeholder="What's happening?"></textarea>
@@ -100,57 +163,38 @@
     </div>
 
     <script>
-        const adminIP = "127.0.0.1"; // Replace with actual IP detection if available
-
-        // Load posts from localStorage on page load
         document.addEventListener("DOMContentLoaded", loadPosts);
 
-        // Function to simulate fetching user's IP
-        function getUserIP() {
-            return "127.0.0.1"; // Replace with actual IP detection if available
-        }
-
-        // Function to create a new post
         function postMessage() {
             const input = document.getElementById("postInput");
             const message = input.value.trim();
 
             if (message) {
-                const isAdmin = getUserIP() === adminIP;
-                const username = isAdmin ? "/admin" : "/user";
+                const username = "/user";
 
-                // Create post object
                 const post = {
                     username: username,
                     message: message,
                     timestamp: new Date().toISOString()
                 };
 
-                // Save to localStorage
                 savePostToLocalStorage(post);
-
-                // Add post to feed
                 addPostToFeed(post);
-
-                // Clear input field
                 input.value = "";
             }
         }
 
-        // Save post to localStorage
         function savePostToLocalStorage(post) {
             let posts = JSON.parse(localStorage.getItem("posts")) || [];
             posts.push(post);
             localStorage.setItem("posts", JSON.stringify(posts));
         }
 
-        // Load posts from localStorage
         function loadPosts() {
             const posts = JSON.parse(localStorage.getItem("posts")) || [];
             posts.forEach(addPostToFeed);
         }
 
-        // Add post to the feed
         function addPostToFeed(post) {
             const feed = document.getElementById("feed");
 
