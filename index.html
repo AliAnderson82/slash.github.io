@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slash</title>
-    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png"> <!-- Favicon link -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- Include p5.js -->
+    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -22,6 +22,7 @@
             align-items: flex-start;
             min-height: 100vh;
             transition: background-color 0.3s ease, color 0.3s ease;
+            padding-top: 60px; /* Space for the input area */
         }
 
         .sidebar {
@@ -48,7 +49,7 @@
 
         .logo {
             width: 30px;
-            height: 30px;
+            height: 20px; /* Adjusted height */
             background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
             background-size: contain;
         }
@@ -62,7 +63,7 @@
 
         .description {
             font-size: 14px;
-            color: #8899a6; /* A lighter color for the description */
+            color: #8899a6;
             text-align: center;
             transition: color 0.3s ease;
         }
@@ -106,7 +107,6 @@
             width: 600px;
             border: 1px solid #333;
             margin-left: 270px;
-            padding-top: 10px;
             transition: background-color 0.3s ease, border 0.3s ease;
             animation: fadeIn 0.5s ease forwards;
             opacity: 0;
@@ -122,13 +122,20 @@
             transition: background-color 0.3s ease;
         }
 
+        /* Fixed input area at the top */
         .input-area {
+            position: fixed; /* Fixed position */
+            top: 0; /* At the top */
+            left: 250px; /* Align with sidebar */
+            width: calc(100% - 250px); /* Fill the remaining space */
+            background-color: #22303c;
             padding: 15px;
-            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            z-index: 1000; /* Above other elements */
         }
 
         .input-area textarea {
-            width: 100%;
+            width: calc(100% - 80px); /* Space for button */
             height: 50px;
             padding: 10px;
             background-color: #22303c;
@@ -146,7 +153,6 @@
         }
 
         .input-area button {
-            float: right;
             padding: 10px 20px;
             background-color: #1d9bf0;
             border: none;
@@ -154,7 +160,7 @@
             border-radius: 20px;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-left: 10px; /* Space between textarea and button */
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -168,6 +174,7 @@
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
+            margin-top: 60px; /* To avoid being covered by the input area */
         }
 
         .post, .dm-post, .notification {
@@ -176,8 +183,6 @@
             border-radius: 8px;
             background-color: #22303c;
             transition: background-color 0.3s ease;
-            display: flex; /* Added to align items */
-            align-items: center; /* Center items vertically */
         }
 
         .post:hover, .dm-post:hover, .notification:hover {
@@ -208,14 +213,6 @@
 
         .hidden {
             display: none;
-        }
-
-        /* Profile picture styling */
-        .profile-pic {
-            width: 20px; /* Adjusted size */
-            height: 20px; /* Adjusted size */
-            border-radius: 50%; /* Make it circular */
-            margin-right: 10px; /* Space between picture and text */
         }
 
         /* Light mode styles */
@@ -285,150 +282,106 @@
         <div class="nav-item" onclick="showSettings()">Settings</div>
     </div>
 
-    <div id="homeContainer" class="container">
+    <div id="homeFeed" class="container">
         <header>Home</header>
-        <ul id="homeFeed" class="feed"></ul>
-        <div class="input-area">
-            <textarea id="postInput" placeholder="What's happening?"></textarea>
-            <button onclick="createPost()">Post</button>
-        </div>
+        <ul class="feed" id="feed"></ul>
     </div>
 
-    <div id="dmsContainer" class="container hidden">
+    <div id="dms" class="container hidden">
         <header>Direct Messages</header>
-        <ul id="dmFeed" class="dm-feed"></ul>
+        <ul class="dm-feed" id="dmFeed"></ul>
     </div>
 
-    <div id="notificationsContainer" class="container hidden">
+    <div id="notifications" class="container hidden">
         <header>Notifications</header>
-        <ul id="notificationsFeed" class="notifications-feed"></ul>
+        <ul class="notifications-feed" id="notificationsFeed"></ul>
     </div>
 
-    <div id="settingsContainer" class="container hidden">
-        <header>Settings</header>
-        <div>
-            <label for="themeToggle">Light/Dark Mode</label>
-            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-        </div>
+    <div class="input-area">
+        <textarea id="messageInput" placeholder="Type your message..."></textarea>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;" />
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+        <button id="uploadImageButton" onclick="document.getElementById('imageInput').click();">Upload Image</button>
     </div>
 
-    <div id="turtleCanvas"></div>
+    <canvas id="turtleCanvas" width="600" height="400"></canvas>
 
     <script>
-        let posts = [];
-        let dms = [];
-        let notifications = [];
-        let currentUser = 'User1';
-        const user1ProfilePic = 'https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg';
-        const user2ProfilePic = 'https://i.postimg.cc/K8xg1L7T/photo-5796596147853313909-x2.jpg';
+        let currentUser = "User1";
+        let messageId = 0;
+        const feed = document.getElementById("feed");
+        const dmFeed = document.getElementById("dmFeed");
+        const notificationsFeed = document.getElementById("notificationsFeed");
+        const notificationBadge = document.getElementById("notificationBadge");
+        let notificationCount = 0;
 
-        function createPost() {
-            const input = document.getElementById('postInput');
-            const content = input.value;
-            if (content) {
-                const post = {
-                    id: posts.length,
-                    content: content,
-                    user: currentUser,
-                    timestamp: new Date().toLocaleString(),
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const imageInput = document.getElementById("imageInput");
+
+            if (messageInput.value.trim() === "" && !imageInput.files.length) return;
+
+            const message = document.createElement("li");
+            message.classList.add("post");
+            message.id = "message" + messageId++;
+            if (currentUser === "User1") message.classList.add("user1");
+            else message.classList.add("user2");
+
+            const username = document.createElement("div");
+            username.classList.add("username");
+            username.textContent = currentUser;
+
+            const messageContent = document.createElement("div");
+            messageContent.textContent = messageInput.value;
+
+            // Handle image upload
+            if (imageInput.files.length) {
+                const file = imageInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.style.maxWidth = "100%"; // Responsive image
+                    message.appendChild(img);
                 };
-                posts.push(post);
-                input.value = '';
-                renderPosts();
+                reader.readAsDataURL(file);
+                imageInput.value = ""; // Reset the input
             }
-        }
 
-        function renderPosts() {
-            const feed = document.getElementById('homeFeed');
-            feed.innerHTML = '';
-            posts.forEach(post => {
-                const li = document.createElement('li');
-                li.className = 'post';
-                li.innerHTML = `
-                    <img src="${user1ProfilePic}" alt="Profile Pic" class="profile-pic">
-                    <div>
-                        <div><strong>${post.user}</strong> - ${post.timestamp}</div>
-                        <div>${post.content}</div>
-                    </div>
-                `;
-                feed.appendChild(li);
-            });
+            message.appendChild(username);
+            message.appendChild(messageContent);
+            feed.appendChild(message);
+            messageInput.value = ""; // Clear input
         }
 
         function showHome() {
-            hideAllContainers();
-            document.getElementById('homeContainer').classList.remove('hidden');
+            document.getElementById("homeFeed").classList.remove("hidden");
+            document.getElementById("dms").classList.add("hidden");
+            document.getElementById("notifications").classList.add("hidden");
         }
 
         function showDMs() {
-            hideAllContainers();
-            document.getElementById('dmsContainer').classList.remove('hidden');
-            renderDMs();
+            document.getElementById("homeFeed").classList.add("hidden");
+            document.getElementById("dms").classList.remove("hidden");
+            document.getElementById("notifications").classList.add("hidden");
         }
 
         function showNotifications() {
-            hideAllContainers();
-            document.getElementById('notificationsContainer').classList.remove('hidden');
-            renderNotifications();
+            document.getElementById("homeFeed").classList.add("hidden");
+            document.getElementById("dms").classList.add("hidden");
+            document.getElementById("notifications").classList.remove("hidden");
         }
 
         function showSettings() {
-            hideAllContainers();
-            document.getElementById('settingsContainer').classList.remove('hidden');
-        }
-
-        function hideAllContainers() {
-            document.getElementById('homeContainer').classList.add('hidden');
-            document.getElementById('dmsContainer').classList.add('hidden');
-            document.getElementById('notificationsContainer').classList.add('hidden');
-            document.getElementById('settingsContainer').classList.add('hidden');
-        }
-
-        function renderDMs() {
-            const dmFeed = document.getElementById('dmFeed');
-            dmFeed.innerHTML = '';
-            dms.forEach(dm => {
-                const li = document.createElement('li');
-                li.className = 'dm-post ' + (dm.user === 'User1' ? 'user1' : 'user2');
-                li.innerHTML = `
-                    <img src="${dm.user === 'User1' ? user1ProfilePic : user2ProfilePic}" alt="Profile Pic" class="profile-pic">
-                    <div>
-                        <div class="username">${dm.user}</div>
-                        <div>${dm.content}</div>
-                    </div>
-                `;
-                dmFeed.appendChild(li);
-            });
-        }
-
-        function renderNotifications() {
-            const notificationsFeed = document.getElementById('notificationsFeed');
-            notificationsFeed.innerHTML = '';
-            notifications.forEach(notification => {
-                const li = document.createElement('li');
-                li.className = 'notification';
-                li.innerHTML = notification;
-                notificationsFeed.appendChild(li);
-            });
-            const notificationBadge = document.getElementById('notificationBadge');
-            notificationBadge.textContent = notifications.length;
-            notificationBadge.classList.toggle('hidden', notifications.length === 0);
+            // Implement your settings logic here
+            alert("Settings clicked!");
         }
 
         function clearNotification(event) {
-            notifications = [];
-            renderNotifications();
             event.stopPropagation();
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            document.querySelector('.sidebar').classList.toggle('light-mode');
-            document.querySelector('.container').classList.toggle('light-mode');
-            document.querySelector('header').classList.toggle('light-mode');
-            document.querySelectorAll('.post').forEach(post => post.classList.toggle('light-mode'));
-            document.querySelectorAll('.dm-post').forEach(dm => dm.classList.toggle('light-mode'));
-            document.querySelectorAll('.notification').forEach(notification => notification.classList.toggle('light-mode'));
+            notificationCount = 0;
+            notificationBadge.textContent = notificationCount;
+            notificationBadge.classList.add("hidden");
         }
     </script>
 </body>
