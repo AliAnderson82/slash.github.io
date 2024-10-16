@@ -7,6 +7,7 @@
     <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png"> <!-- Favicon link -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- Include p5.js -->
     <style>
+        /* Styling remains the same as previous code */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -205,12 +206,11 @@
             <div class="title-text">Slash</div>
             <div class="description">Anonymity Rules</div>
         </div>
-        <div class="nav-item" onclick="showHome()">Home</div>
-        <div class="nav-item" onclick="showDMs()">Direct Messages</div>
-        <div class="nav-item" onclick="showNotifications()" id="notificationsNav">Notifications
+        <div class="nav-item" onclick="showContainer('homeContainer')">Home</div>
+        <div class="nav-item" onclick="showContainer('dmContainer')">Direct Messages</div>
+        <div class="nav-item" onclick="showContainer('notificationsContainer')" id="notificationsNav">Notifications
             <div id="notificationBadge" class="notification-badge hidden">0</div>
         </div>
-        <div class="nav-item" onclick="showSettings()">Settings</div>
     </div>
 
     <div id="homeContainer" class="container">
@@ -237,36 +237,21 @@
     </div>
 
     <script>
-        let unreadNotifications = 0;
-
-        function showHome() {
-            hideAllContainers();
-            document.getElementById("homeContainer").classList.remove("hidden");
+        // Tab Functionality
+        function showContainer(containerId) {
+            const containers = document.querySelectorAll('.container');
+            containers.forEach(container => container.classList.add('hidden'));
+            document.getElementById(containerId).classList.remove('hidden');
         }
 
-        function showDMs() {
-            hideAllContainers();
-            document.getElementById("dmContainer").classList.remove("hidden");
-        }
-
-        function showNotifications() {
-            hideAllContainers();
-            document.getElementById("notificationsContainer").classList.remove("hidden");
-        }
-
-        function hideAllContainers() {
-            document.getElementById("homeContainer").classList.add("hidden");
-            document.getElementById("dmContainer").classList.add("hidden");
-            document.getElementById("notificationsContainer").classList.add("hidden");
-        }
-
+        // Posting Functionality
         function postHomeMessage() {
             const input = document.getElementById("homeInput");
             const message = input.value.trim();
             if (message) {
                 const post = {
                     username: "/user",
-                    avatar: "path/to/avatar.jpg", // Replace with the actual path to user avatar
+                    avatar: "https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg", // Replace with the actual path to user avatar
                     message: message,
                     timestamp: new Date().toLocaleString()
                 };
@@ -291,6 +276,7 @@
             }
         }
 
+        // Adding Posts and Notifications
         function addPostToFeed(post, feedId) {
             const feed = document.getElementById(feedId);
             const postElement = document.createElement("li");
