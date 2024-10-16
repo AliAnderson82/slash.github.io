@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slash</title>
-    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png"> <!-- Favicon link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- Include p5.js -->
     <style>
         * {
             box-sizing: border-box;
@@ -15,29 +15,29 @@
         }
 
         body {
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #15202b;
+            color: #ffffff;
             display: flex;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            font-size: 16px;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .sidebar {
             width: 250px;
             padding: 20px;
-            background-color: #2c3e50;
-            border-right: 1px solid #dcdcdc;
+            background-color: #1c2733;
+            border-right: 1px solid #333;
             height: 100vh;
             position: fixed;
-            top: 0;
             left: 0;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+            top: 0;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            transform: translateX(0);
         }
 
+        /* Logo and Title Styling */
         .title-logo {
             display: flex;
             flex-direction: column;
@@ -47,47 +47,46 @@
         }
 
         .logo {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
-            background-size: cover;
-            border-radius: 50%;
+            background-size: contain;
         }
 
         .title-text {
-            font-size: 24px;
-            color: #ecf0f1;
-            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 28px;
+            color: #1d9bf0;
             transition: color 0.3s ease;
         }
 
         .description {
             font-size: 14px;
-            color: #bdc3c7;
+            color: #8899a6; /* A lighter color for the description */
             text-align: center;
             transition: color 0.3s ease;
         }
 
         .sidebar .nav-item {
-            padding: 15px;
+            padding: 15px 10px;
             margin-bottom: 10px;
             font-size: 18px;
-            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            color: #ffffff;
             cursor: pointer;
             border-radius: 8px;
             transition: background-color 0.2s ease, transform 0.2s ease;
-            display: flex;
-            align-items: center;
             position: relative;
         }
 
         .sidebar .nav-item:hover {
-            background-color: #34495e;
+            background-color: #22303c;
             transform: scale(1.05);
         }
 
         .notification-badge {
-            background-color: #e74c3c;
+            background-color: #ff4757;
             color: #ffffff;
             font-size: 12px;
             width: 20px;
@@ -99,71 +98,74 @@
             position: absolute;
             right: 15px;
             top: 15px;
+            transition: transform 0.3s ease;
+            cursor: pointer; /* Change cursor to pointer */
         }
 
         .container {
+            width: 600px;
+            border: 1px solid #333;
             margin-left: 270px;
-            padding: 20px;
-            width: calc(100% - 270px);
+            padding-top: 10px;
             transition: background-color 0.3s ease, border 0.3s ease;
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
-            background-color: #2980b9;
-            color: #fff;
-            padding: 15px;
+            background-color: #22303c;
+            padding: 10px 20px;
             text-align: center;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s; /* Add animation */
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            font-size: 24px;
+            transition: background-color 0.3s ease;
         }
 
         .input-area {
             padding: 15px;
-            border-top: 1px solid #dcdcdc;
-            position: fixed;
-            bottom: 0;
-            left: 270px;
-            width: calc(100% - 270px);
-            background-color: #ffffff;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            z-index: 10;
+            border-top: 1px solid #333;
+            position: sticky;
+            bottom: 0; /* Keep it at the bottom */
+            background-color: #15202b;
         }
 
         .input-area textarea {
             width: 100%;
             height: 50px;
             padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #dcdcdc;
-            color: #333;
+            background-color: #22303c;
+            border: 1px solid #333;
+            color: #ffffff;
             resize: none;
-            border-radius: 5px;
+            font-size: 16px;
+            border-radius: 8px;
             outline: none;
-            transition: border 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
         .input-area textarea:focus {
-            border-color: #2980b9;
+            background-color: #2c3644;
         }
 
         .input-area button {
+            float: right;
             padding: 10px 20px;
-            background-color: #2980b9;
+            background-color: #1d9bf0;
             border: none;
             color: #ffffff;
-            border-radius: 5px;
+            border-radius: 20px;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .input-area button:hover {
-            background-color: #1a627c;
+            background-color: #1a8cd8;
             transform: scale(1.05);
         }
 
@@ -172,56 +174,47 @@
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
-            margin-bottom: 70px;
+            margin-bottom: 70px; /* Leave space for the input area */
         }
 
         .post, .dm-post, .notification {
-            padding: 15px;
-            margin: 10px 0;
+            padding: 10px 15px;
+            margin: 10px;
             border-radius: 8px;
-            background-color: #ecf0f1;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            opacity: 0; /* Initially hidden */
-            animation: fadeIn 0.5s forwards; /* Fade-in animation */
+            background-color: #22303c;
+            display: flex; /* Flex layout for posts */
+            align-items: center; /* Center items vertically */
+            transition: background-color 0.3s ease;
         }
 
         .post:hover, .dm-post:hover, .notification:hover {
-            background-color: #bdc3c7;
+            background-color: #2c3644;
         }
 
         .dm-post.user1 {
-            background-color: #3498db;
+            background-color: #1d9bf0;
             color: #ffffff;
         }
 
         .dm-post.user2 {
-            background-color: #95a5a6;
-            color: #2c3e50;
+            background-color: #8899a6;
+            color: #15202b;
         }
 
         .dm-post .username {
             font-weight: bold;
-            margin-left: 10px;
         }
 
-        .user-profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-            background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
-            background-size: cover;
+        .dm-post.user1 .username {
+            color: #ffffff;
+        }
+
+        .dm-post.user2 .username {
+            color: #15202b;
         }
 
         .hidden {
             display: none;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         /* Light mode styles */
@@ -241,23 +234,81 @@
         }
 
         header.light-mode {
-            background-color: #2980b9;
-            color: #ffffff;
+            background-color: #e0e0e0;
+            color: #000000;
         }
 
         .input-area.light-mode textarea {
-            background-color: #ffffff;
+            background-color: #f0f0f0;
             border: 1px solid #ccc;
             color: #000000;
         }
 
         .input-area.light-mode button {
-            background-color: #2980b9;
+            background-color: #1d9bf0;
         }
 
         .post.light-mode, .dm-post.light-mode, .notification.light-mode {
-            background-color: #ecf0f1;
+            background-color: #e0e0e0;
             color: #000000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Canvas Styling */
+        #turtleCanvas {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #1d9bf0;
+        }
+
+        /* DM Pane */
+        .dm-pane {
+            width: 250px;
+            border-right: 1px solid #333;
+            background-color: #22303c;
+            overflow-y: auto;
+            padding: 10px;
+            position: relative;
+        }
+
+        .dm-pane h2 {
+            font-size: 20px;
+            color: #1d9bf0;
+            margin-bottom: 10px;
+        }
+
+        .chat-item {
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #2c3644;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background-color: #3a4450;
+        }
+
+        /* Profile Image */
+        .profile-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px; /* Space between image and text */
+        }
+
+        .post-content {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
         }
 
     </style>
@@ -267,127 +318,114 @@
         <div class="title-logo">
             <div class="logo"></div>
             <div class="title-text">Slash</div>
-            <div class="description">Connecting Through Creativity</div>
+            <div class="description">Connect & Share</div>
         </div>
-        <div class="nav-item" onclick="toggleTheme()">Toggle Theme</div>
-        <div class="nav-item" id="notifications">Notifications <span class="notification-badge" id="notificationCount">0</span></div>
-        <div class="nav-item" onclick="toggleDMFeed()">Direct Messages</div>
+        <div class="nav-item" onclick="toggleMode()">Toggle Dark/Light Mode</div>
+        <div class="nav-item" onclick="openDM()">Direct Messages <span class="notification-badge" id="dm-notifications">2</span></div>
+        <div class="nav-item" onclick="openNotifications()">Notifications <span class="notification-badge" id="notification-badge">5</span></div>
+        <div class="nav-item" onclick="toggleCanvas()">Drawing</div>
     </div>
-    <div class="container">
-        <header>Community Feed</header>
+
+    <div class="container" id="main-container">
+        <header>Chat Room</header>
         <ul class="feed" id="feed"></ul>
         <div class="input-area">
-            <textarea id="messageInput" placeholder="Type your message here..."></textarea>
+            <textarea id="messageInput" placeholder="Type your message..."></textarea>
             <button onclick="sendMessage()">Send</button>
         </div>
-        <canvas id="turtleCanvas" width="600" height="400"></canvas>
-    </div>
-    <div class="container hidden" id="dmContainer">
-        <header>Direct Messages</header>
-        <ul class="dm-feed" id="dmFeed"></ul>
-        <div class="input-area">
-            <textarea id="dmMessageInput" placeholder="Type your DM here..."></textarea>
-            <button onclick="sendDM()">Send</button>
-        </div>
-    </div>
-    <div class="container hidden" id="notificationsContainer">
-        <header>Notifications</header>
-        <ul class="notifications-feed" id="notificationsFeed"></ul>
     </div>
 
+    <div class="dm-pane hidden" id="dm-pane">
+        <h2>Direct Messages</h2>
+        <div class="chat-item" onclick="loadDM('user1')">User 1</div>
+        <div class="chat-item" onclick="loadDM('user2')">User 2</div>
+    </div>
+
+    <div class="notifications-feed hidden" id="notifications-feed">
+        <h2>Notifications</h2>
+        <ul class="notifications"></ul>
+    </div>
+
+    <canvas id="turtleCanvas" width="600" height="400"></canvas>
     <script>
-        const messages = JSON.parse(localStorage.getItem('messages')) || [];
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        let currentUser = "User1"; // Change this to reflect the logged-in user
-
-        function toggleTheme() {
-            document.body.classList.toggle("light-mode");
-            document.querySelector(".sidebar").classList.toggle("light-mode");
-            document.querySelector(".container").classList.toggle("light-mode");
-            document.querySelector("header").classList.toggle("light-mode");
-            document.querySelector(".input-area").classList.toggle("light-mode");
-            document.querySelectorAll(".post").forEach(post => post.classList.toggle("light-mode"));
-            document.querySelectorAll(".dm-post").forEach(post => post.classList.toggle("light-mode"));
-            document.querySelectorAll(".notification").forEach(notification => notification.classList.toggle("light-mode"));
-        }
+        let messages = JSON.parse(localStorage.getItem('messages')) || [];
 
         function renderMessages() {
             const feed = document.getElementById('feed');
-            feed.innerHTML = ''; // Clear existing messages
-
-            messages.forEach((msg, index) => {
-                const li = document.createElement('li');
-                li.className = 'post';
-                li.innerHTML = `<div class="user-profile"></div><span>${msg.username}: ${msg.message}</span>`;
-                feed.appendChild(li);
+            feed.innerHTML = ''; // Clear current messages
+            messages.forEach(message => {
+                const post = document.createElement('li');
+                post.className = 'post';
+                post.innerHTML = `
+                    <img src="${message.profileImage}" class="profile-image" alt="Profile Image">
+                    <div class="post-content">
+                        <strong>${message.username}:</strong> ${message.text}
+                    </div>
+                `;
+                feed.appendChild(post);
             });
+            feed.scrollTop = feed.scrollHeight; // Auto-scroll to the bottom
         }
 
         function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-            if (message) {
-                messages.push({ username: currentUser, message });
+            const input = document.getElementById('messageInput');
+            if (input.value.trim() !== '') {
+                const newMessage = {
+                    username: 'User', // Replace with dynamic username
+                    text: input.value,
+                    profileImage: 'https://via.placeholder.com/40' // Placeholder for user image
+                };
+                messages.push(newMessage);
                 localStorage.setItem('messages', JSON.stringify(messages));
                 renderMessages();
-                messageInput.value = ''; // Clear input field
+                input.value = ''; // Clear input
             }
         }
 
-        // Toggle Direct Message Feed
-        function toggleDMFeed() {
-            const dmContainer = document.getElementById('dmContainer');
-            const feed = document.getElementById('feed');
-            if (dmContainer.style.display === 'none') {
-                feed.style.display = 'none';
-                dmContainer.style.display = 'block';
-                renderDMs();
-            } else {
-                feed.style.display = 'block';
-                dmContainer.style.display = 'none';
+        function toggleMode() {
+            document.body.classList.toggle('light-mode');
+            document.querySelector('.sidebar').classList.toggle('light-mode');
+            document.querySelector('.container').classList.toggle('light-mode');
+            document.querySelector('header').classList.toggle('light-mode');
+            document.querySelectorAll('.post').forEach(post => post.classList.toggle('light-mode'));
+            document.querySelectorAll('.dm-post').forEach(post => post.classList.toggle('light-mode'));
+            document.querySelectorAll('.notification').forEach(notification => notification.classList.toggle('light-mode'));
+        }
+
+        function openDM() {
+            const dmPane = document.getElementById('dm-pane');
+            dmPane.classList.toggle('hidden');
+        }
+
+        function loadDM(user) {
+            // Load direct messages logic (not implemented here)
+            alert(`Loading messages for ${user}`);
+        }
+
+        function openNotifications() {
+            const notificationsFeed = document.getElementById('notifications-feed');
+            notificationsFeed.classList.toggle('hidden');
+        }
+
+        function toggleCanvas() {
+            const canvas = document.getElementById('turtleCanvas');
+            canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
+            if (canvas.style.display === 'block') {
+                draw();
             }
         }
 
-        const dms = JSON.parse(localStorage.getItem('dms')) || [];
-
-        function renderDMs() {
-            const dmFeed = document.getElementById('dmFeed');
-            dmFeed.innerHTML = ''; // Clear existing DMs
-
-            dms.forEach(dm => {
-                const li = document.createElement('li');
-                li.className = 'dm-post user1'; // Example user class
-                li.innerHTML = `<div class="user-profile"></div><span class="username">${dm.username}:</span> ${dm.message}`;
-                dmFeed.appendChild(li);
-            });
+        function draw() {
+            const canvas = document.getElementById('turtleCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'lightblue';
+            ctx.fillRect(20, 20, 100, 100);
+            // More drawing code here
         }
 
-        function sendDM() {
-            const dmMessageInput = document.getElementById('dmMessageInput');
-            const dmMessage = dmMessageInput.value.trim();
-            if (dmMessage) {
-                dms.push({ username: currentUser, message: dmMessage });
-                localStorage.setItem('dms', JSON.stringify(dms));
-                renderDMs();
-                dmMessageInput.value = ''; // Clear input field
-            }
-        }
-
-        // Rendering existing messages on page load
+        // Initial rendering of messages
         renderMessages();
-
-        // Simulate user list with clickable usernames
-        users.forEach(user => {
-            const userItem = document.createElement('div');
-            userItem.className = 'nav-item';
-            userItem.textContent = user.username;
-            userItem.onclick = () => alert(`DM started with ${user.username}`);
-            document.querySelector('.sidebar').appendChild(userItem);
-        });
-
-        // Add some example users
-        users.push({ username: "User2" }, { username: "User3" });
-        localStorage.setItem('users', JSON.stringify(users));
     </script>
 </body>
 </html>
