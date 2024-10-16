@@ -4,40 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slash</title>
-    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png"> <!-- Favicon link -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- Include p5.js -->
+    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #15202b;
-            color: #ffffff;
+            background-color: #f4f4f4;
+            color: #333;
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: flex-start;
             min-height: 100vh;
             transition: background-color 0.3s ease, color 0.3s ease;
+            font-size: 16px;
         }
 
         .sidebar {
             width: 250px;
             padding: 20px;
-            background-color: #1c2733;
-            border-right: 1px solid #333;
+            background-color: #2c3e50;
+            border-right: 1px solid #dcdcdc;
             height: 100vh;
             position: fixed;
-            left: 0;
             top: 0;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            transform: translateX(0);
+            left: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
         }
 
-        /* Logo and Title Styling */
         .title-logo {
             display: flex;
             flex-direction: column;
@@ -47,46 +47,46 @@
         }
 
         .logo {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
-            background-size: contain;
+            background-size: cover;
+            border-radius: 50%;
         }
 
         .title-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 28px;
-            color: #1d9bf0;
+            font-size: 24px;
+            color: #ecf0f1;
+            text-align: center;
             transition: color 0.3s ease;
         }
 
         .description {
             font-size: 14px;
-            color: #8899a6; /* A lighter color for the description */
+            color: #bdc3c7;
             text-align: center;
             transition: color 0.3s ease;
         }
 
         .sidebar .nav-item {
-            padding: 15px 10px;
+            padding: 15px;
             margin-bottom: 10px;
             font-size: 18px;
-            display: flex;
-            align-items: center;
-            color: #ffffff;
+            color: #ecf0f1;
             cursor: pointer;
             border-radius: 8px;
             transition: background-color 0.2s ease, transform 0.2s ease;
-            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .sidebar .nav-item:hover {
-            background-color: #22303c;
+            background-color: #34495e;
             transform: scale(1.05);
         }
 
         .notification-badge {
-            background-color: #ff4757;
+            background-color: #e74c3c;
             color: #ffffff;
             font-size: 12px;
             width: 20px;
@@ -98,73 +98,70 @@
             position: absolute;
             right: 15px;
             top: 15px;
-            transition: transform 0.3s ease;
-            cursor: pointer; /* Change cursor to pointer */
         }
 
         .container {
-            width: 600px;
-            border: 1px solid #333;
             margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
             transition: background-color 0.3s ease, border 0.3s ease;
-            animation: fadeIn 0.5s ease forwards;
-            opacity: 0;
-            position: relative; /* Added to position the input area properly */
         }
 
         header {
-            background-color: #22303c;
-            padding: 10px 20px;
+            background-color: #2980b9;
+            color: #fff;
+            padding: 15px;
             text-align: center;
-            border-bottom: 1px solid #333;
-            font-weight: bold;
-            font-size: 24px;
-            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
         .input-area {
             padding: 15px;
-            border-top: 1px solid #333;
-            position: fixed; /* Changed to fixed */
-            bottom: 0; /* Fixed to bottom */
-            left: 270px; /* Align to the left of the container */
-            width: calc(600px - 30px); /* Full width minus padding */
-            background-color: #22303c;
+            border-top: 1px solid #dcdcdc;
+            position: fixed;
+            bottom: 0;
+            left: 270px;
+            width: calc(100% - 270px);
+            background-color: #ffffff;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 10;
         }
 
         .input-area textarea {
             width: 100%;
             height: 50px;
             padding: 10px;
-            background-color: #22303c;
-            border: 1px solid #333;
-            color: #ffffff;
+            background-color: #f9f9f9;
+            border: 1px solid #dcdcdc;
+            color: #333;
             resize: none;
-            font-size: 16px;
-            border-radius: 8px;
+            border-radius: 5px;
             outline: none;
-            transition: background-color 0.3s ease;
+            transition: border 0.3s ease;
         }
 
         .input-area textarea:focus {
-            background-color: #2c3644;
+            border-color: #2980b9;
         }
 
         .input-area button {
-            float: right;
             padding: 10px 20px;
-            background-color: #1d9bf0;
+            background-color: #2980b9;
             border: none;
             color: #ffffff;
-            border-radius: 20px;
+            border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .input-area button:hover {
-            background-color: #1a8cd8;
+            background-color: #1a627c;
             transform: scale(1.05);
         }
 
@@ -173,53 +170,45 @@
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
-            margin-bottom: 70px; /* Add space for the input area */
+            margin-bottom: 70px;
         }
 
         .post, .dm-post, .notification {
-            padding: 10px 15px;
-            margin: 10px;
+            padding: 15px;
+            margin: 10px 0;
             border-radius: 8px;
-            background-color: #22303c;
-            transition: background-color 0.3s ease;
-            display: flex; /* Flexbox to arrange items */
-            align-items: center; /* Center align items */
+            background-color: #ecf0f1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
         }
 
         .post:hover, .dm-post:hover, .notification:hover {
-            background-color: #2c3644;
+            background-color: #bdc3c7;
         }
 
         .dm-post.user1 {
-            background-color: #1d9bf0;
+            background-color: #3498db;
             color: #ffffff;
         }
 
         .dm-post.user2 {
-            background-color: #8899a6;
-            color: #15202b;
+            background-color: #95a5a6;
+            color: #2c3e50;
         }
 
         .dm-post .username {
             font-weight: bold;
-            margin-left: 10px; /* Added margin */
-        }
-
-        .dm-post.user1 .username {
-            color: #ffffff;
-        }
-
-        .dm-post.user2 .username {
-            color: #15202b;
+            margin-left: 10px;
         }
 
         .user-profile {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin-right: 10px; /* Margin to space from username */
+            margin-right: 10px;
             background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
-            background-size: contain;
+            background-size: cover;
         }
 
         .hidden {
@@ -243,34 +232,28 @@
         }
 
         header.light-mode {
-            background-color: #e0e0e0;
-            color: #000000;
+            background-color: #2980b9;
+            color: #ffffff;
         }
 
         .input-area.light-mode textarea {
-            background-color: #f0f0f0;
+            background-color: #ffffff;
             border: 1px solid #ccc;
             color: #000000;
         }
 
         .input-area.light-mode button {
-            background-color: #1d9bf0;
+            background-color: #2980b9;
         }
 
         .post.light-mode, .dm-post.light-mode, .notification.light-mode {
-            background-color: #e0e0e0;
+            background-color: #ecf0f1;
             color: #000000;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
-        }
-
-        /* Canvas Styling */
-        #turtleCanvas {
-            border: 1px solid #333;
-            margin-bottom: 20px; /* Add some space below the canvas */
         }
 
         /* DM Popup styling */
@@ -307,7 +290,7 @@
         </div>
         <canvas id="turtleCanvas" width="600" height="400"></canvas>
     </div>
-    <div class="container" id="dmContainer" style="display: none;">
+    <div class="container hidden" id="dmContainer">
         <header>Direct Messages</header>
         <ul class="dm-feed" id="dmFeed"></ul>
         <div class="input-area">
@@ -440,7 +423,6 @@
         // Add some example users
         users.push({ username: "User2" }, { username: "User3" });
         localStorage.setItem('users', JSON.stringify(users));
-
     </script>
 </body>
 </html>
