@@ -122,22 +122,13 @@
             transition: background-color 0.3s ease;
         }
 
-        /* New styles for input area */
         .input-area {
-            display: flex;
-            align-items: center;
             padding: 15px;
             border-top: 1px solid #333;
-            position: fixed; /* Fixed position */
-            top: 0; /* At the top of the viewport */
-            left: 270px; /* Align with the container */
-            right: 0; /* Full width */
-            background-color: #22303c; /* Match sidebar */
-            z-index: 10; /* Ensure it’s above other elements */
         }
 
         .input-area textarea {
-            flex: 1;
+            width: 100%;
             height: 50px;
             padding: 10px;
             background-color: #22303c;
@@ -148,7 +139,6 @@
             border-radius: 8px;
             outline: none;
             transition: background-color 0.3s ease;
-            margin-right: 10px; /* Space between textarea and button */
         }
 
         .input-area textarea:focus {
@@ -156,6 +146,7 @@
         }
 
         .input-area button {
+            float: right;
             padding: 10px 20px;
             background-color: #1d9bf0;
             border: none;
@@ -163,6 +154,7 @@
             border-radius: 20px;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -176,7 +168,6 @@
             padding: 0;
             max-height: 400px;
             overflow-y: auto;
-            margin-top: 70px; /* Leave space for input area */
         }
 
         .post, .dm-post, .notification {
@@ -185,8 +176,8 @@
             border-radius: 8px;
             background-color: #22303c;
             transition: background-color 0.3s ease;
-            display: flex; /* Flexbox for alignment */
-            align-items: center; /* Align items vertically */
+            display: flex; /* Added to align items */
+            align-items: center; /* Center items vertically */
         }
 
         .post:hover, .dm-post:hover, .notification:hover {
@@ -205,18 +196,26 @@
 
         .dm-post .username {
             font-weight: bold;
-            margin-right: 10px; /* Space between username and message */
         }
 
-        .dm-post img {
-            width: 40px; /* Profile picture size */
-            height: 40px; /* Profile picture size */
-            border-radius: 50%; /* Make it circular */
-            margin-right: 10px; /* Space between picture and text */
+        .dm-post.user1 .username {
+            color: #ffffff;
+        }
+
+        .dm-post.user2 .username {
+            color: #15202b;
         }
 
         .hidden {
             display: none;
+        }
+
+        /* Profile picture styling */
+        .profile-pic {
+            width: 20px; /* Adjusted size */
+            height: 20px; /* Adjusted size */
+            border-radius: 50%; /* Make it circular */
+            margin-right: 10px; /* Space between picture and text */
         }
 
         /* Light mode styles */
@@ -279,80 +278,157 @@
             <div class="description">Anonymity Rules</div>
         </div>
         <div class="nav-item" onclick="showHome()">Home</div>
-        <div class="nav-item" onclick="showDM()">Direct Message <span class="notification-badge">2</span></div>
-        <div class="nav-item" onclick="showNotifications()">Notifications <span class="notification-badge">3</span></div>
-    </div>
-    <div class="container">
-        <header>Feed</header>
-        <div class="input-area">
-            <textarea id="messageInput" placeholder="Type your message here..."></textarea>
-            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-            <button id="uploadBtn" onclick="document.getElementById('imageUpload').click()">Upload Image</button>
-            <button id="sendMessage" onclick="sendMessage()">Send</button>
+        <div class="nav-item" onclick="showDMs()">Direct Messages</div>
+        <div class="nav-item" onclick="showNotifications()" id="notificationsNav">Notifications
+            <div id="notificationBadge" class="notification-badge hidden" onclick="clearNotification(event)">0</div>
         </div>
-        <ul id="feed" class="feed"></ul>
+        <div class="nav-item" onclick="showSettings()">Settings</div>
     </div>
-    <canvas id="turtleCanvas" width="400" height="400"></canvas>
-    
+
+    <div id="homeContainer" class="container">
+        <header>Home</header>
+        <ul id="homeFeed" class="feed"></ul>
+        <div class="input-area">
+            <textarea id="postInput" placeholder="What's happening?"></textarea>
+            <button onclick="createPost()">Post</button>
+        </div>
+    </div>
+
+    <div id="dmsContainer" class="container hidden">
+        <header>Direct Messages</header>
+        <ul id="dmFeed" class="dm-feed"></ul>
+    </div>
+
+    <div id="notificationsContainer" class="container hidden">
+        <header>Notifications</header>
+        <ul id="notificationsFeed" class="notifications-feed"></ul>
+    </div>
+
+    <div id="settingsContainer" class="container hidden">
+        <header>Settings</header>
+        <div>
+            <label for="themeToggle">Light/Dark Mode</label>
+            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+        </div>
+    </div>
+
+    <div id="turtleCanvas"></div>
+
     <script>
-        const feed = document.getElementById('feed');
-        const messageInput = document.getElementById('messageInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-        let uploadedImage;
+        let posts = [];
+        let dms = [];
+        let notifications = [];
+        let currentUser = 'User1';
+        const user1ProfilePic = 'https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg';
+        const user2ProfilePic = 'https://i.postimg.cc/K8xg1L7T/photo-5796596147853313909-x2.jpg';
 
-        function sendMessage() {
-            const message = messageInput.value;
-            if (message || uploadedImage) {
-                const post = document.createElement('li');
-                post.classList.add('post');
-                
-                // Create a profile picture element
-                const profilePic = document.createElement('img');
-                profilePic.src = 'https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg'; // Profile picture URL
-                post.appendChild(profilePic);
-                
-                // Create a message element
-                const messageElement = document.createElement('span');
-                messageElement.textContent = message;
-                post.appendChild(messageElement);
-                
-                // If an image was uploaded, create an image element
-                if (uploadedImage) {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = uploadedImage;
-                    imgElement.style.width = '100px'; // Set width for the uploaded image
-                    imgElement.style.marginLeft = '10px'; // Space between message and image
-                    post.appendChild(imgElement);
-                }
-
-                feed.appendChild(post);
-                messageInput.value = '';
-                uploadedImage = null; // Reset uploaded image
-                document.getElementById('imageUpload').value = ''; // Reset file input
+        function createPost() {
+            const input = document.getElementById('postInput');
+            const content = input.value;
+            if (content) {
+                const post = {
+                    id: posts.length,
+                    content: content,
+                    user: currentUser,
+                    timestamp: new Date().toLocaleString(),
+                };
+                posts.push(post);
+                input.value = '';
+                renderPosts();
             }
         }
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedImage = e.target.result; // Store the uploaded image
-                }
-                reader.readAsDataURL(file);
-            }
+        function renderPosts() {
+            const feed = document.getElementById('homeFeed');
+            feed.innerHTML = '';
+            posts.forEach(post => {
+                const li = document.createElement('li');
+                li.className = 'post';
+                li.innerHTML = `
+                    <img src="${user1ProfilePic}" alt="Profile Pic" class="profile-pic">
+                    <div>
+                        <div><strong>${post.user}</strong> - ${post.timestamp}</div>
+                        <div>${post.content}</div>
+                    </div>
+                `;
+                feed.appendChild(li);
+            });
         }
 
         function showHome() {
-            // Logic to show home
+            hideAllContainers();
+            document.getElementById('homeContainer').classList.remove('hidden');
         }
 
-        function showDM() {
-            // Logic to show direct messages
+        function showDMs() {
+            hideAllContainers();
+            document.getElementById('dmsContainer').classList.remove('hidden');
+            renderDMs();
         }
 
         function showNotifications() {
-            // Logic to show notifications
+            hideAllContainers();
+            document.getElementById('notificationsContainer').classList.remove('hidden');
+            renderNotifications();
+        }
+
+        function showSettings() {
+            hideAllContainers();
+            document.getElementById('settingsContainer').classList.remove('hidden');
+        }
+
+        function hideAllContainers() {
+            document.getElementById('homeContainer').classList.add('hidden');
+            document.getElementById('dmsContainer').classList.add('hidden');
+            document.getElementById('notificationsContainer').classList.add('hidden');
+            document.getElementById('settingsContainer').classList.add('hidden');
+        }
+
+        function renderDMs() {
+            const dmFeed = document.getElementById('dmFeed');
+            dmFeed.innerHTML = '';
+            dms.forEach(dm => {
+                const li = document.createElement('li');
+                li.className = 'dm-post ' + (dm.user === 'User1' ? 'user1' : 'user2');
+                li.innerHTML = `
+                    <img src="${dm.user === 'User1' ? user1ProfilePic : user2ProfilePic}" alt="Profile Pic" class="profile-pic">
+                    <div>
+                        <div class="username">${dm.user}</div>
+                        <div>${dm.content}</div>
+                    </div>
+                `;
+                dmFeed.appendChild(li);
+            });
+        }
+
+        function renderNotifications() {
+            const notificationsFeed = document.getElementById('notificationsFeed');
+            notificationsFeed.innerHTML = '';
+            notifications.forEach(notification => {
+                const li = document.createElement('li');
+                li.className = 'notification';
+                li.innerHTML = notification;
+                notificationsFeed.appendChild(li);
+            });
+            const notificationBadge = document.getElementById('notificationBadge');
+            notificationBadge.textContent = notifications.length;
+            notificationBadge.classList.toggle('hidden', notifications.length === 0);
+        }
+
+        function clearNotification(event) {
+            notifications = [];
+            renderNotifications();
+            event.stopPropagation();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            document.querySelector('.sidebar').classList.toggle('light-mode');
+            document.querySelector('.container').classList.toggle('light-mode');
+            document.querySelector('header').classList.toggle('light-mode');
+            document.querySelectorAll('.post').forEach(post => post.classList.toggle('light-mode'));
+            document.querySelectorAll('.dm-post').forEach(dm => dm.classList.toggle('light-mode'));
+            document.querySelectorAll('.notification').forEach(notification => notification.classList.toggle('light-mode'));
         }
     </script>
 </body>
