@@ -11,7 +11,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         body {
@@ -21,8 +21,8 @@
             justify-content: flex-start;
             align-items: flex-start;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
             font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .sidebar {
@@ -78,6 +78,7 @@
             transition: background-color 0.2s ease, transform 0.2s ease;
             display: flex;
             align-items: center;
+            position: relative;
         }
 
         .sidebar .nav-item:hover {
@@ -115,6 +116,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
+            animation: fadeIn 0.5s; /* Add animation */
         }
 
         .input-area {
@@ -181,6 +183,8 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
+            opacity: 0; /* Initially hidden */
+            animation: fadeIn 0.5s forwards; /* Fade-in animation */
         }
 
         .post:hover, .dm-post:hover, .notification:hover {
@@ -213,6 +217,11 @@
 
         .hidden {
             display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* Light mode styles */
@@ -251,22 +260,6 @@
             color: #000000;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* DM Popup styling */
-        .dm-popup {
-            position: absolute;
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            z-index: 10;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -278,7 +271,6 @@
         </div>
         <div class="nav-item" onclick="toggleTheme()">Toggle Theme</div>
         <div class="nav-item" id="notifications">Notifications <span class="notification-badge" id="notificationCount">0</span></div>
-        <div class="nav-item">Friends</div>
         <div class="nav-item" onclick="toggleDMFeed()">Direct Messages</div>
     </div>
     <div class="container">
@@ -381,33 +373,6 @@
             }
         }
 
-        // User Interaction
-        function showDMRequest(username) {
-            const dmPopup = document.createElement('div');
-            dmPopup.className = 'dm-popup';
-            dmPopup.innerHTML = `
-                <div>Start a DM with ${username}?</div>
-                <button onclick="startDM('${username}')">Accept</button>
-                <button onclick="closePopup(this)">Decline</button>
-            `;
-            document.body.appendChild(dmPopup);
-            dmPopup.style.display = 'block';
-        }
-
-        function startDM(username) {
-            // Implement the logic to start a DM
-            alert(`DM started with ${username}`);
-            // Close the popup
-            const popup = document.querySelector('.dm-popup');
-            if (popup) {
-                popup.remove();
-            }
-        }
-
-        function closePopup(button) {
-            button.parentElement.remove(); // Remove popup
-        }
-
         // Rendering existing messages on page load
         renderMessages();
 
@@ -416,7 +381,7 @@
             const userItem = document.createElement('div');
             userItem.className = 'nav-item';
             userItem.textContent = user.username;
-            userItem.onclick = () => showDMRequest(user.username);
+            userItem.onclick = () => alert(`DM started with ${user.username}`);
             document.querySelector('.sidebar').appendChild(userItem);
         });
 
