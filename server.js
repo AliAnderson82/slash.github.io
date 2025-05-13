@@ -5,67 +5,58 @@ const multer = require("multer");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const DATA_FILE = "messages.json";
-const UPLOADS_FOLDER = "uploads";
 
+// Setup
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
-app.use(`/uploads`, express.static(path.join(__dirname, UPLOADS_FOLDER)));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Ensure uploads folder exists
-if (!fs.existsSync(UPLOADS_FOLDER)) {
-    fs.mkdirSync(UPLOADS_FOLDER);
-}
-
-// Multer setup for image uploads
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, UPLOADS_FOLDER),
+    destination: (req, file, cb) => cb(null, "uploads/"),
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    },
+        const ext = path.extname(file.originalname);
+        cb(null, `${Date.now()}-${file.originalname}`);
+    }
 });
 const upload = multer({ storage });
 
-// Load messages from file
+// Load messages
 function loadMessages() {
     try {
         const data = fs.readFileSync(DATA_FILE);
         return JSON.parse(data);
-    } catch (error) {
+    } catch {
         return [];
     }
 }
 
-// Save messages to file
+// Save messages
 function saveMessages(messages) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(messages, null, 2));
 }
 
-// Get all messages
+// Routes
 app.get("/api/messages", (req, res) => {
-    const messages = loadMessages();
-    res.json(messages);
+    res.json(loadMessages());
 });
 
-// Post a new message
-app.post("/api/messages", (req, res) => {
-    const newMessage = req.body;
-    newMessage.timestamp = new Date().toISOString();
+app.post("/api/messages", upload.single("image"), (req, res) => {
     const messages = loadMessages();
+    const newMessage = {
+        username: req.body.username || "/user",
+        message: req.body.message,
+        timestamp: new Date().toISOString(),
+        imageUrl: req.file ? `/uploads/${req.file.filename}` : null
+    };
     messages.push(newMessage);
     saveMessages(messages);
     res.json(newMessage);
 });
 
-// Upload an image
-app.post("/api/upload", upload.single("image"), (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-    res.json({ url: `/uploads/${req.file.filename}` });
-});
-
+// Start
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
