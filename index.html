@@ -2,72 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Slash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slash Chat</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
-        textarea { width: 100%; height: 60px; }
-        .post { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px; }
-        .timestamp { color: #888; font-size: 0.8em; }
-        img { max-width: 100%; margin-top: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e1e1e;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        textarea {
+            flex: 1;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #007bff;
+            border: none;
+            color: white;
+        }
+        ul.feed {
+            list-style: none;
+            padding: 0;
+        }
+        .post {
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .username {
+            font-weight: bold;
+        }
+        .timestamp {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Slash</h1>
-    <textarea id="postInput" placeholder="What's happening?"></textarea>
-    <input type="file" id="imageInput" />
-    <button onclick="postMessage()">Post</button>
-    <ul id="feed"></ul>
-</div>
+    <div class="container">
+        <header>Slash Chat</header>
 
-<script>
-    const apiUrl = "http://slash.serveo.net/api/messages";
+        <div class="input-area">
+            <textarea id="postInput" placeholder="What's happening?"></textarea>
+            <button onclick="postMessage()">Post</button>
+        </div>
 
-    document.addEventListener("DOMContentLoaded", loadPosts);
+        <ul id="feed" class="feed"></ul>
+    </div>
 
-    function loadPosts() {
-        fetch(apiUrl)
-            .then(res => res.json())
-            .then(posts => posts.forEach(addPostToFeed))
-            .catch(console.error);
-    }
+    <script>
+        const apiUrl = "http://slash.serveo.net/api/messages";
 
-    function postMessage() {
-        const message = document.getElementById("postInput").value.trim();
-        const imageFile = document.getElementById("imageInput").files[0];
-        if (!message && !imageFile) return;
+        // Load posts on page load
+        document.addEventListener("DOMContentLoaded", loadPosts);
 
-        const formData = new FormData();
-        formData.append("message", message);
-        if (imageFile) formData.append("image", imageFile);
+        function loadPosts() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(posts => {
+                    posts.forEach(addPostToFeed);
+                })
+                .catch(err => console.error("Error loading posts:", err));
+        }
 
-        fetch(apiUrl, {
-            method: "POST",
-            body: formData,
-        })
-            .then(res => res.json())
-            .then(post => {
-                addPostToFeed(post);
-                document.getElementById("postInput").value = "";
-                document.getElementById("imageInput").value = "";
+        function postMessage() {
+            const input = document.getElementById("postInput");
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            const post = {
+                username: "/user",
+                message: message,
+                timestamp: new Date().toISOString()
+            };
+
+            fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(post),
             })
-            .catch(console.error);
-    }
+                .then(response => response.json())
+                .then(savedPost => {
+                    addPostToFeed(savedPost);
+                    input.value = "";
+                })
+                .catch(err => console.error("Error posting message:", err));
+        }
 
-    function addPostToFeed(post) {
-        const li = document.createElement("li");
-        li.classList.add("post");
+        function addPostToFeed(post) {
+            const feed = document.getElementById("feed");
+            const postElement = document.createElement("li");
+            postElement.className = "post";
 
-        li.innerHTML = `
-            <strong>${post.username}</strong>
-            <p>${post.message}</p>
-            ${post.imageUrl ? `<img src="${post.imageUrl}" />` : ""}
-            <div class="timestamp">${new Date(post.timestamp).toLocaleString()}</div>
-        `;
+            const timestamp = new Date(post.timestamp || Date.now()).toLocaleString();
 
-        document.getElementById("feed").prepend(li);
-    }
-</script>
+            postElement.innerHTML = `
+                <span class="username">${post.username}</span>
+                <div class="message">${post.message}</div>
+                <div class="timestamp">${timestamp}</div>
+            `;
+
+            feed.appendChild(postElement);
+        }
+    </script>
 </body>
 </html>
