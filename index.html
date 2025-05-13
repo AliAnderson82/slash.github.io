@@ -1,483 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slash</title>
-    <link rel="icon" href="https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg" type="image/png"> <!-- Favicon link -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- Include p5.js -->
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #15202b;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .sidebar {
-            width: 250px;
-            padding: 20px;
-            background-color: #1c2733;
-            border-right: 1px solid #333;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            transform: translateX(0);
-        }
-
-        /* Logo and Title Styling */
-        .title-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            width: 30px;
-            height: 30px;
-            background: url('https://i.postimg.cc/6QYz5403/photo-5796596147853313909-x.jpg') no-repeat center center;
-            background-size: contain;
-        }
-
-        .title-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 28px;
-            color: #1d9bf0;
-            transition: color 0.3s ease;
-        }
-
-        .description {
-            font-size: 14px;
-            color: #8899a6; /* A lighter color for the description */
-            text-align: center;
-            transition: color 0.3s ease;
-        }
-
-        .sidebar .nav-item {
-            padding: 15px 10px;
-            margin-bottom: 10px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            color: #ffffff;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-            position: relative;
-        }
-
-        .sidebar .nav-item:hover {
-            background-color: #22303c;
-            transform: scale(1.05);
-        }
-
-        .notification-badge {
-            background-color: #ff4757;
-            color: #ffffff;
-            font-size: 12px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            transition: transform 0.3s ease;
-            cursor: pointer; /* Change cursor to pointer */
-        }
-
-        .container {
-            width: 600px;
-            border: 1px solid #333;
-            margin-left: 270px;
-            padding-top: 10px;
-            transition: background-color 0.3s ease, border 0.3s ease;
-            animation: fadeIn 0.5s ease forwards;
-            opacity: 0;
-        }
-
-        header {
-            background-color: #22303c;
-            padding: 10px 20px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-            font-weight: bold;
-            font-size: 24px;
-            transition: background-color 0.3s ease;
-        }
-
-        .input-area {
-            padding: 15px;
-            border-top: 1px solid #333;
-        }
-
-        .input-area textarea {
-            width: 100%;
-            height: 50px;
-            padding: 10px;
-            background-color: #22303c;
-            border: 1px solid #333;
-            color: #ffffff;
-            resize: none;
-            font-size: 16px;
-            border-radius: 8px;
-            outline: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .input-area textarea:focus {
-            background-color: #2c3644;
-        }
-
-        .input-area button {
-            float: right;
-            padding: 10px 20px;
-            background-color: #1d9bf0;
-            border: none;
-            color: #ffffff;
-            border-radius: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .input-area button:hover {
-            background-color: #1a8cd8;
-            transform: scale(1.05);
-        }
-
-        .feed, .dm-feed, .notifications-feed {
-            list-style-type: none;
-            padding: 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .post, .dm-post, .notification {
-            padding: 10px 15px;
-            margin: 10px;
-            border-radius: 8px;
-            background-color: #22303c;
-            transition: background-color 0.3s ease;
-        }
-
-        .post:hover, .dm-post:hover, .notification:hover {
-            background-color: #2c3644;
-        }
-
-        .dm-post.user1 {
-            background-color: #1d9bf0;
-            color: #ffffff;
-        }
-
-        .dm-post.user2 {
-            background-color: #8899a6;
-            color: #15202b;
-        }
-
-        .dm-post .username {
-            font-weight: bold;
-        }
-
-        .dm-post.user1 .username {
-            color: #ffffff;
-        }
-
-        .dm-post.user2 .username {
-            color: #15202b;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* Light mode styles */
-        body.light-mode {
-            background-color: #ffffff;
-            color: #000000;
-        }
-
-        .sidebar.light-mode {
-            background-color: #f0f0f0;
-            border-right: 1px solid #ccc;
-        }
-
-        .container.light-mode {
-            background-color: #ffffff;
-            border: 1px solid #ccc;
-        }
-
-        header.light-mode {
-            background-color: #e0e0e0;
-            color: #000000;
-        }
-
-        .input-area.light-mode textarea {
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            color: #000000;
-        }
-
-        .input-area.light-mode button {
-            background-color: #1d9bf0;
-        }
-
-        .post.light-mode, .dm-post.light-mode, .notification.light-mode {
-            background-color: #e0e0e0;
-            color: #000000;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Canvas Styling */
-        #turtleCanvas {
-            display: none; /* Hidden by default */
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid #1d9bf0;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Slash</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 1rem;
+    }
+    header {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      resize: none;
+    }
+    .feed {
+      list-style: none;
+      padding: 0;
+    }
+    .post {
+      background: #1e1e1e;
+      margin: 1rem 0;
+      padding: 0.75rem;
+      border-radius: 8px;
+    }
+    .timestamp {
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+    .message {
+      margin: 0.5rem 0;
+    }
+    .image {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="title-logo">
-            <div class="logo"></div>
-            <div class="title-text">Slash</div>
-            <div class="description">Anonymity Rules</div>
-        </div>
-        <div class="nav-item" onclick="showHome()">Home</div>
-        <div class="nav-item" onclick="showDMs()">Direct Messages</div>
-        <div class="nav-item" onclick="showNotifications()" id="notificationsNav">Notifications
-            <div id="notificationBadge" class="notification-badge hidden" onclick="clearNotification(event)">0</div>
-        </div>
-        <div class="nav-item" onclick="showSettings()">Settings</div>
+  <div class="container">
+    <header>Slash</header>
+    <div class="input-area">
+      <textarea id="postInput" placeholder="What's happening?"></textarea>
+      <input type="file" id="imageInput" />
+      <button onclick="postMessage()">Post</button>
     </div>
+    <ul id="feed" class="feed"></ul>
+  </div>
 
-    <div id="homeContainer" class="container">
-        <header>Home</header>
-        <ul id="homeFeed" class="feed"></ul>
-        <div class="input-area">
-            <textarea id="homeInput" placeholder="Type your message..."></textarea>
-            <button onclick="postHomeMessage()">Post</button>
-        </div>
-    </div>
+  <script>
+    const apiUrl = "https://slash-chat-backend.onrender.com/api/messages";
 
-    <div id="dmContainer" class="container hidden">
-        <header>Direct Messages</header>
-        <ul id="dmFeed" class="dm-feed"></ul>
-        <div class="input-area">
-            <textarea id="dmInput" placeholder="Type your message..."></textarea>
-            <button onclick="postDMMessage()">Send</button>
-        </div>
-    </div>
+    document.addEventListener("DOMContentLoaded", loadPosts);
 
-    <div id="notificationsContainer" class="container hidden">
-        <header>Notifications</header>
-        <ul id="notificationsFeed" class="notifications-feed"></ul>
-    </div>
+    function loadPosts() {
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(posts => {
+          posts.forEach(addPostToFeed);
+        })
+        .catch(error => console.error("Error loading posts:", error));
+    }
 
-    <div id="settingsContainer" class="container hidden">
-        <header>Settings</header>
-        <div>
-            <label for="themeSelect">Choose Theme:</label>
-            <select id="themeSelect" onchange="changeTheme()">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-            </select>
-        </div>
-    </div>
+    function postMessage() {
+      const input = document.getElementById("postInput");
+      const fileInput = document.getElementById("imageInput");
+      const message = input.value.trim();
 
-    <canvas id="turtleCanvas" width="800" height="600"></canvas>
+      const reader = new FileReader();
+      if (fileInput.files.length > 0) {
+        reader.onload = function () {
+          sendPost(message, reader.result);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        sendPost(message, null);
+      }
+    }
 
-    <script>
-        let unreadNotifications = 0;
+    function sendPost(message, imageData) {
+      if (message || imageData) {
+        const post = {
+          username: "/user",
+          message: message,
+          image: imageData,
+          timestamp: new Date().toISOString(),
+        };
 
-        // Add event listener to the document to listen for keypresses
-        document.addEventListener('keydown', checkEasterEgg);
+        fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(post),
+        })
+          .then(response => response.json())
+          .then(savedPost => {
+            addPostToFeed(savedPost);
+            document.getElementById("postInput").value = "";
+            document.getElementById("imageInput").value = "";
+          })
+          .catch(error => console.error("Error posting message:", error));
+      }
+    }
 
-        // Add click event listener for notification badge
-        document.getElementById("notificationBadge").addEventListener('click', clearNotification);
+    function addPostToFeed(post) {
+      const feed = document.getElementById("feed");
+      const postElement = document.createElement("li");
+      postElement.classList.add("post");
 
-        function showHome() {
-            hideAllContainers();
-            document.getElementById("homeContainer").classList.remove("hidden");
-        }
+      postElement.innerHTML = \`
+        <span class="username">\${post.username}</span>
+        <div class="timestamp">\${new Date(post.timestamp).toLocaleString()}</div>
+        <div class="message">\${post.message || ""}</div>
+        \${post.image ? '<img class="image" src="' + post.image + '" />' : ""}
+      \`;
 
-        function showDMs() {
-            hideAllContainers();
-            document.getElementById("dmContainer").classList.remove("hidden");
-        }
-
-        function showNotifications() {
-            hideAllContainers();
-            document.getElementById("notificationsContainer").classList.remove("hidden");
-        }
-
-        function showSettings() {
-            hideAllContainers();
-            document.getElementById("settingsContainer").classList.remove("hidden");
-        }
-
-        function hideAllContainers() {
-            document.getElementById("homeContainer").classList.add("hidden");
-            document.getElementById("dmContainer").classList.add("hidden");
-            document.getElementById("notificationsContainer").classList.add("hidden");
-            document.getElementById("settingsContainer").classList.add("hidden");
-        }
-
-        function postHomeMessage() {
-            const input = document.getElementById("homeInput");
-            const message = input.value.trim();
-            if (message) {
-                const post = {
-                    username: "/user",
-                    message: message,
-                    timestamp: new Date().toISOString()
-                };
-                addPostToFeed(post, "homeFeed");
-                input.value = "";
-            }
-        }
-
-        function postDMMessage() {
-            const input = document.getElementById("dmInput");
-            const message = input.value.trim();
-            if (message) {
-                const post = {
-                    username: "/user",
-                    message: message,
-                    timestamp: new Date().toISOString()
-                };
-                addPostToFeed(post, "dmFeed");
-                input.value = "";
-                addNotification("New direct message received!");
-            }
-        }
-
-        function addPostToFeed(post, feedId) {
-            const feed = document.getElementById(feedId);
-            const postElement = document.createElement("li");
-            postElement.classList.add(feedId === "homeFeed" ? "post" : "dm-post", "user1");
-            postElement.innerHTML = `<div class="username">${post.username}</div><div>${post.message}</div>`;
-            feed.appendChild(postElement);
-        }
-
-        function addNotification(message) {
-            unreadNotifications++;
-            document.getElementById("notificationBadge").textContent = unreadNotifications;
-            document.getElementById("notificationBadge").classList.remove("hidden");
-            const notificationFeed = document.getElementById("notificationsFeed");
-            const notificationElement = document.createElement("li");
-            notificationElement.classList.add("notification");
-            notificationElement.textContent = message;
-            notificationFeed.appendChild(notificationElement);
-        }
-
-        function clearNotification(event) {
-            event.stopPropagation(); // Prevent the event from bubbling up
-            unreadNotifications = 0; // Reset the notification count
-            document.getElementById("notificationBadge").textContent = unreadNotifications;
-            document.getElementById("notificationBadge").classList.add("hidden");
-            const notificationFeed = document.getElementById("notificationsFeed");
-            notificationFeed.innerHTML = ''; // Clear notifications
-        }
-
-        function changeTheme() {
-            const theme = document.getElementById("themeSelect").value;
-            if (theme === "light") {
-                document.body.classList.add("light-mode");
-                document.querySelector(".sidebar").classList.add("light-mode");
-                document.querySelector(".container").classList.add("light-mode");
-                document.querySelectorAll("header").forEach(header => header.classList.add("light-mode"));
-                document.querySelectorAll(".post, .dm-post, .notification").forEach(post => post.classList.add("light-mode"));
-            } else {
-                document.body.classList.remove("light-mode");
-                document.querySelector(".sidebar").classList.remove("light-mode");
-                document.querySelector(".container").classList.remove("light-mode");
-                document.querySelectorAll("header").forEach(header => header.classList.remove("light-mode"));
-                document.querySelectorAll(".post, .dm-post, .notification").forEach(post => post.classList.remove("light-mode"));
-            }
-        }
-
-        function checkEasterEgg(event) {
-            const input = document.getElementById("homeInput");
-            // Check if the message input is not focused
-            if (document.activeElement !== input) {
-                // Check if the key pressed is 'a' to build the string
-                if (event.key === 'a') {
-                    const currentText = (input.value + "a").slice(-7); // Get the last 7 characters
-                    if (currentText === "awesome") {
-                        startTurtleAnimation();
-                    }
-                }
-            }
-        }
-
-        function startTurtleAnimation() {
-            const canvas = document.getElementById("turtleCanvas");
-            canvas.style.display = "block"; // Show the canvas
-
-            // Set up p5.js sketch
-            new p5((sketch) => {
-                let angle = 0;
-                const colors = ["blue", "red", "darkviolet", "green", "yellow", "white", "darkblue"];
-                let colorIndex = 0;
-
-                sketch.setup = () => {
-                    sketch.createCanvas(800, 600);
-                    sketch.background(0);
-                };
-
-                sketch.draw = () => {
-                    sketch.fill(colors[colorIndex]);
-                    sketch.stroke(colors[colorIndex]);
-                    sketch.clear();
-                    sketch.background(0);
-
-                    for (let i = 0; i < 10; i++) {
-                        sketch.beginShape();
-                        for (let j = 0; j < 360; j += 10) {
-                            const x = 400 + cos(radians(j + angle)) * 200;
-                            const y = 300 + sin(radians(j + angle)) * 200;
-                            sketch.vertex(x, y);
-                        }
-                        sketch.endShape(sketch.CLOSE);
-                        angle += 10; // Increment the angle for the next shape
-                        colorIndex = (colorIndex + 1) % colors.length;
-                    }
-
-                    if (angle >= 360) {
-                        // Stop the animation after 5 seconds
-                        setTimeout(() => {
-                            canvas.style.display = "none"; // Hide the canvas after 5 seconds
-                            sketch.noLoop(); // Stop the draw loop
-                        }, 5000);
-                    }
-                };
-            });
-        }
-    </script>
+      feed.appendChild(postElement);
+    }
+  </script>
 </body>
 </html>
