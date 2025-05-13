@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Slash</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        textarea { width: 100%; height: 60px; }
+        .post { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px; }
+        .timestamp { color: #888; font-size: 0.8em; }
+        img { max-width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Slash</h1>
+    <textarea id="postInput" placeholder="What's happening?"></textarea>
+    <input type="file" id="imageInput" />
+    <button onclick="postMessage()">Post</button>
+    <ul id="feed"></ul>
+</div>
+
+<script>
+    const apiUrl = "http://slash.serveo.net/api/messages";
+
+    document.addEventListener("DOMContentLoaded", loadPosts);
+
+    function loadPosts() {
+        fetch(apiUrl)
+            .then(res => res.json())
+            .then(posts => posts.forEach(addPostToFeed))
+            .catch(console.error);
+    }
+
+    function postMessage() {
+        const message = document.getElementById("postInput").value.trim();
+        const imageFile = document.getElementById("imageInput").files[0];
+        if (!message && !imageFile) return;
+
+        const formData = new FormData();
+        formData.append("message", message);
+        if (imageFile) formData.append("image", imageFile);
+
+        fetch(apiUrl, {
+            method: "POST",
+            body: formData,
+        })
+            .then(res => res.json())
+            .then(post => {
+                addPostToFeed(post);
+                document.getElementById("postInput").value = "";
+                document.getElementById("imageInput").value = "";
+            })
+            .catch(console.error);
+    }
+
+    function addPostToFeed(post) {
+        const li = document.createElement("li");
+        li.classList.add("post");
+
+        li.innerHTML = `
+            <strong>${post.username}</strong>
+            <p>${post.message}</p>
+            ${post.imageUrl ? `<img src="${post.imageUrl}" />` : ""}
+            <div class="timestamp">${new Date(post.timestamp).toLocaleString()}</div>
+        `;
+
+        document.getElementById("feed").prepend(li);
+    }
+</script>
+</body>
+</html>
